@@ -1,0 +1,204 @@
+visit youtube for setup  
+channel : iTech e-learn
+https://www.youtube.com/watch?v=hzjlOKhnJrs&list=PLuJZH5pDX4GKrPyVImrii6mZ3kdwAOLvv&index=23
+
+
+This is views.py
+from django.shortcuts import render
+# Create your views here.
+from django.http import HttpResponse
+def index(request): #first create a view and map to URL
+    return HttpResponse("Hello World!")
+
+
+This is url.py
+from first_app import views
+urlpatterns = [
+    path('',views.index), #add this line 
+    path('admin/', admin.site.urls),
+]
+
+In settings.py
+add first_app(or whatever name is) in installed apps 
+
+Django Commands :
+python manage.py runserver
+django-admin startproject first_project
+after creating a project change directory 
+cd C:\Users\sksal\OneDrive\Desktop\djangostuff  (after change directory-> create a app there say app2)
+python manage.py startapp app2
+
+
+after all of this 
+step 1: Go to settings.py and add app2 in installed apps 
+step2: Go to views.py and start make a view 
+step3: Go to URLs and import views from app2 and make a path / map views to URL
+
+
+Another method of URL mapping : 
+Do this in url.py 
+1. from django.conf.urls import include
+urlpatterns=[.......url(r'^first_app/', include('first_app.urls')...........]
+After url say ..8000/first_project/its_my_.... kind of this will happen , few words will direct to correct page , few not 
+
+Templates in django :
+Help to write HTML and link directly 
+project->template->app
+It dynamically generates the correct file path regardless of computers for this use python os module 
+views.py =>
+ def index(request):
+    my_dict= {'insert_me' : "This is my view.py !"}
+    return render(request, './../templates/index.html', context= my_dict)
+
+settings.py 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_DIR = (os.path.join(BASE_DIR,"templates"))
+add app2 in installed apps 
+
+make urls.py
+for connectivity , while searching on browser ...80/images/  => this will give us a image rendering 
+
+
+We can add static images 
+create a static_dir in settings.py connect it , create a folder static in project2 
+STATICfILES_DIR =[static_dir,]
+use {% %} in html page and add image 
+
+
+Topics covered :
+setting up project and applications 
+creating views and mapping urls 
+using simple template and tags 
+serving static media files 
+
+MOdels : Best topic
+here we will add some models in models.py and register in admin then we will create a super_user which will handle 
+the operations on models 
+To populate/Test data we will create a faker library and create a script to populate 
+
+pip install Faker, read documentation- create fake name,date,address
+in project2/Templates  add a file populate_app2 in this file do this....
+import os
+os.environ.setdefault('DJANGO_SETTING_MODULE','first_project.settings')
+import django
+django.setup()
+
+import random()
+from first_app.models import AcessRecord,webpage,Topic
+from faker import Faker 
+
+fakegen= Faker()
+topics= ['news','search','social','marketplace','games']
+
+def add_topic():
+  t= Topic.object.get_or_create(top_name=random.choice(topics))[0]
+  t.save()
+  return t
+
+def populate(N=5):
+  for entry in range(N):
+    top=add_topic()
+    fake_url=fakegen.url()
+    fake_date=fakegen.date()
+    fake_name=fakegen.name()
+
+webpg= webpage.object.get_or_create(topic=top,url=fake_url,name=fake_name)[0]
+acc_rec=AcessRecord.object.get_or_create(name=webpg,date=fake_date)[0]
+
+if __name__==  '__main__' :
+  print('populating_script')
+  populate(20)
+
+now : run a command  python populate_app2.py => it will start populating now you can runserver and add/admin in browser url
+
+MTV: how to connect models-templates-views , we have 3 methods to serve dynamic content 
+
+method 1 :
+
+in view,py :- add
+from app2.models import AceessREcord,Topic,webpage
+
+def index(request):
+   webpage_list= AcessRecord.objects.order_by('date')
+   date_dic = {'acess_records' : webpage_list }
+   return render(request, './../templates/index.html', context= date_dic)
+
+in index.html do this :- add
+{% load staticfiles %}
+
+<div class="django2">
+{% if acess_records %}
+  <table>
+    <thead>
+       <th> Site name </th>
+       <th> Date accessed </th>
+     </thead>
+  </table>
+ {% for acc in access_records %}
+  <tr> 
+     <td> {{ acc.name }} </td>
+     <td> {{ acc.date }} </td>
+  </tr>
+ {% endfor %}
+ </table>
+ {% else %}
+      <p> NO RECORD FOUND </p>
+ {% endif %}
+</div>
+
+project 2 :- 
+create a user with first_name, last_name, email in model.py , make admin to acess (register this model) , populate this and add a url /user for directly acessing its html
+or /admin for admin acess 
+yotube practice project Time stamp - 1:09
+https://www.youtube.com/watch?v=dxzf4XGao5M&list=PLuJZH5pDX4GKrPyVImrii6mZ3kdwAOLvv&index=25
+
+steps to follow for scratch 
+create a folder project_user in django_stuff by command
+create app_user by command
+add template in project_user and add a app_template in template 
+create a file index.html (for home page) and user.html (for /user) in app_template
+Go to settings.py create a BASE_DIR, TEMPLATE_DIR (join templates ) , add dirs in templates and add app_user in installed apps 
+Go to models.py create a class user with first name (max_len) , last name(max_len) , email (max_len,unique=true)
+Go to views.py and write 2 functions , index and user , for home page and /user 
+in def index render(request, './../app_template/index.html')
+in def user user_list = user.object.order_by('first_name') , user_dict = { 'user_dict_key' : user_list } , render user_dict
+Now there are 2 urls , one on project_user (for whole project - 1 line , admin/ only ) and another in app_user ()
+in app urls add 3 lines admn/, '' for home page (views.index) , and users/ with include(app_user.urls)
+Then run 
+migrations (python manage.py migrate)
+register the models (python manage.py makemigrations app_user )
+again migrate 
+
+Go to admin and register models there admin.site.register(user)
+we are ready to runserver
+write user.html using weired syntax 
+create a independent file populate.py like mange.py in djano_stuff and write fake code 
+python populate.py
+python manage.py runserver 
+
+CHILL !!
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
