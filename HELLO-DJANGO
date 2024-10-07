@@ -181,6 +181,45 @@ python manage.py runserver
 
 CHILL !!
 
+form is missing , how to take imput from user (in -built form in django )
+form is almost same as a model 
+make a form.py in app_2, write a form_name_view in view.py and handle logic of if if_valid 
+csrf token is necessary , for security check on inputs 
+
+Django form validation : hidden field for custom form validation
+how to stop bots ? we have in-built validators ( do it in forms.py )
+Add check for empty field, bots, add clean method for entire form
+
+botcatcher= forms.charfield(required=False,widget=forms.HiddenInput)
+
+def clean_botcacher (self) :
+ botcacher = self.cleaned_data['botcacher']
+ if len (botcacher) >0  :
+   raise forms.validationError ('Bot found') 
+return botcacher 
+
+inbuilt validators :
+from django.core import validators
+after widget use validators = [validators.MaxLengthValidators(0)]
+
+custom validators using validators parameter : (name must start with Z )
+def check_for_z(value):
+  if value[0].lower != 'z' :
+     raise froms.ValidationError('Name must be start with z')
+also add this -  name= forms.charField(validators=[check_for_z])
+
+
+add custom validators like password and again password must be same 
+def clean(self) : 
+  all_clean_data = super().clean()
+  pass= all_clean_data['password']    //because it's all a dictionary 
+  conf_pass = all_clean_data['confirm_password']
+
+  if(pass != conf_pass) : 
+    raise forms.ValidationError ('both pass didnt match')
+
+
+
 
 
 
