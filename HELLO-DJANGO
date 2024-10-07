@@ -218,6 +218,21 @@ def clean(self) :
   if(pass != conf_pass) : 
     raise forms.ValidationError ('both pass didnt match')
 
+models form : 
+forms.ModelForm in forms.py and create a form from pre-existing model 
+then we use meta class to connect form and model 
+
+from django import forms 
+form app_2.models import MyModel
+class MyNewForm(forms.ModelForm) :
+  class Meta :
+    model = MyModel 
+    fiels = //lets see the options 
+
+option 1 : set it to  '__all__' 
+option 2 : exclude= ['field1','field2']
+option 3 : fields = ('field1', 'field2')
+
 
 
 
